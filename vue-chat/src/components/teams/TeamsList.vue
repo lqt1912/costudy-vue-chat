@@ -1,16 +1,18 @@
 <template>
-  <router-view></router-view>
-  <ul>
-    <teams-item
+  <div class="container-fluid row d-flex">
+  <ul class="col-3 m-0">
+    <teams-item 
       v-for="conversation in conversations"
       :key="conversation.conversation.oid"
       :oid="conversation.conversation.oid"
       :name="getUserName(conversation)"
       :message="getLatestMessage(conversation)"
+      
     ></teams-item>
   </ul>
-
-  <button v-on:click="getListConversation()">Test</button>
+  <router-view  :key="$route.fullPath">
+  </router-view>
+  </div>
 </template>
 
 <script>

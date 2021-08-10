@@ -5,6 +5,7 @@
     class="row d-flex"
   >
     <div
+      v-if="messageType === 0"
       v-on:click="toggleCreatedDate()"
       class=" message " style="margin: 2px"
       :class="{
@@ -17,15 +18,36 @@
       }"
     >
       <!-- Message content -->
-      <pre v-if="messageType === 0">  {{ message[0] }}</pre>
-      <div class="border" v-else-if="messageType === 3">
+      <pre>  {{ message[0] }}</pre>
+    </div>
+
+     <div class="message" 
+     v-if="messageType === 3" 
+     :class="{
+        'guest-message': !isSender,
+        'message-sender': isSender,
+        'message-client': !isSender,
+        'not-border-top-left' : (borderType && !isSender),
+        'not-border-top-right': (borderType && isSender),
+        
+      }">
         <h5>{{ message.author_name }}</h5>
         <p>{{ message.title }}...</p>
       </div>
-      <div v-else-if="messageType === 1">
-        <img class="w-100" :src="message[0].image_hash" alt="" />
+
+      <div  v-else-if="messageType === 1"
+          
+       >
+        <img style="max-width: 150px;max-height: 150px" 
+        
+        class="m-1 image-border "
+        v-for="msg in message" 
+        :key="msg.oid" 
+        :src="msg.image_hash" 
+        alt="">
       </div>
-    </div>
+
+      
     <br />
     <transition name="fade">
     <p class="col-12 created-date" v-if="isShowDate">{{ convertedDate(createdDate) }}</p>
@@ -93,9 +115,9 @@ export default {
   padding-bottom: 10px;
   padding-right: 20px;
   padding-left: 20px;
-
   border-radius: 20px;
   background-color: #c1d5f5;
+  max-width: 450px;;
 }
 .message-sender {
   border-bottom-right-radius: 5px ; 
@@ -160,4 +182,11 @@ pre{
     margin-bottom: 0px;
 }
 
+.image-border{
+  border: 1px solid gray;
+  border-radius: 10px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  margin-left: 10px;
+}
 </style>

@@ -44,9 +44,9 @@ export default {
       }
     );
 
-    const dataPromise = promise.then(response=>{
-        return response;
-    })
+    const dataPromise = promise.then(response => {
+      return response;
+    });
     return dataPromise;
   }
 };

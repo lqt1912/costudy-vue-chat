@@ -16,7 +16,7 @@
 <style scoped>
 header {
   width: 100%;
-  height: 5rem;
+  height: 2.6rem;
   background-color: #11005c;
 }
 
@@ -54,5 +54,6 @@ a.router-link-active {
   color: #f1a80a;
   border-color: #f1a80a;
   background-color: #1a037e;
+  transition: opacity .5s;
 }
 </style>

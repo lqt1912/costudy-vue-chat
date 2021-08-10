@@ -1,6 +1,7 @@
 <template>
   <li class="border">
-    <router-link :to="getLink">
+    <router-link :to="getLink"
+    >
       <h2>{{ name }}</h2>
       <h4>{{ message }}</h4>
       {{oid}}
@@ -30,7 +31,6 @@ li {
   margin: 1rem 0;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.26);
   border-radius: 12px;
-  padding: 1rem;
 }
 
 li h2 {
@@ -52,11 +52,16 @@ a {
   color: white;
   display: inline-block;
   padding: 0.5rem 1.5rem;
-  background-color: gray;
+  background-color: gray; 
+  transition:  .5s !important;
 }
 
 a:hover,
 a:active {
-  background-color: gainsboro;
+  background-color: brown;
+}
+
+.custom-active{
+  background-color: brown;
 }
 </style>
