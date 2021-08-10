@@ -7,7 +7,6 @@
       :oid="conversation.conversation.oid"
       :name="getUserName(conversation)"
       :message="getLatestMessage(conversation)"
-      
     ></teams-item>
   </ul>
   <router-view  :key="$route.fullPath">

@@ -1,6 +1,6 @@
  <template >
  <div class="col-6" >
-  <section style="background-color: gray; " class="mt-4 " >
+  <section style="background-color: gray; " class="m-0 mt-4 " >
     <h2 class="pb-2" style="color: white">{{ receiverName }}</h2>
     <ul class="chat-box scrollable" ref="msgContainer" id="msgContainer">
       <li>
@@ -397,7 +397,6 @@ export default {
 }
 section {
   margin: 2rem auto;
-  max-width: 40rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.26);
   padding: 1rem;
   border-radius: 12px;
