@@ -21,12 +21,12 @@
   </div>
   <!-- 
   <ul>
-    <user-item v-for="user in users" :key="user.id" :name="user.fullName" :role="user.role"></user-item>
+    <message v-for="user in users" :key="user.id" :name="user.fullName" :role="user.role"></message>
   </ul> -->
 </template>
 
 <script>
-//import UserItem from './UserItem.vue';
+//import Message from './Message.vue';
 import auth from '../../auth/auth';
 export default {
   data() {
@@ -36,7 +36,7 @@ export default {
     };
   },
   components: {
-    //UserItem,
+    //Message,
   },
   inject: ['users'],
   methods: {

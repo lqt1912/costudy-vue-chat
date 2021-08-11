@@ -3,10 +3,10 @@
     <nav>
       <ul>
         <li>
-          <router-link to="/teams">Teams</router-link>
+          <router-link to="/login">Login</router-link>
         </li>
         <li>
-          <router-link to="/users">Users</router-link>
+          <router-link to="/conversations">Conversations</router-link>
         </li>
       </ul>
     </nav>
@@ -54,6 +54,6 @@ a.router-link-active {
   color: #f1a80a;
   border-color: #f1a80a;
   background-color: #1a037e;
-  transition: opacity .5s;
+  transition: opacity 0.5s;
 }
 </style>

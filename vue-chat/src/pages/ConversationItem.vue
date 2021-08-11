@@ -1,143 +1,156 @@
  <template >
- <div class="col-6" >
-  <section style="background-color: gray; " class="m-0 mt-4 " >
-    <h2 class="pb-2" style="color: white">{{ receiverName }}</h2>
-    <ul class="chat-box scrollable" ref="msgContainer" id="msgContainer">
-      <li>
-        <div class="text-center" v-on:click="loadTeamMembers(teamId)">
-          Load More
+  <div class="col-6 pl-1">
+    <section style="background-color: #2a8383" class="m-0 mt-1">
+      <h2 class="m-0 pb-1" style="color: white">{{ receiverName }}</h2>
+      <ul class="chat-box scrollable" ref="msgContainer" id="msgContainer">
+        <li>
+          <div class="text-center" v-on:click="loadConversationItem(teamId)">
+            Load More
+          </div>
+        </li>
+        <transition-group name="list-messages">
+          <message
+            v-for="(message, index) in messages"
+            :key="message"
+            :message="message.content"
+            :sender="message.sender_name"
+            :isSender="isSender(message)"
+            :messageType="message.message_type"
+            :createdDate="message.modified_date"
+            :index="index"
+            :borderType="isNotBorder(message)"
+            class="single-message pt-0 pb-0 mt-0 mb-0"
+            :class="{ 'mb-3': index === currentSkip - 1 }"
+            @setImageModal="setImageModal"
+          ></message>
+        </transition-group>
+      </ul>
+      <div id="image-preview" style="max-height: 100px" class="d-flex">
+        <div class="img-wrap" v-for="url in previewUrls" :key="url">
+          <span class="close" v-on:click="removeImageFromPreview(url.fileName)"
+            ><font-awesome-icon icon="times"
+          /></span>
+          <img
+            :src="url.url"
+            style="
+              width: 100px;
+              height: 100px;
+              object-fit: fill;
+              border-radius: 20px;
+            "
+            class="p-2"
+            alt=""
+          />
         </div>
-      </li>
-      <transition-group name="list-messages">
-        <user-item
-          v-for="(message, index) in messages"
-          :key="message"
-          :message="message.content"
-          :sender="message.sender_name"
-          :isSender="isSender(message)"
-          :messageType="message.message_type"
-          :createdDate="message.modified_date"
-          :index="index"
-          :borderType="isNotBorder(message)"
-          class="single-message pt-0 pb-0 mt-0 mb-0"
-          :class="{ 'mb-3': index === currentSkip - 1 }"
-        ></user-item>
-      </transition-group>
-    </ul>
-    <div id="image-preview" style="max-height: 100px" class="d-flex">
-      <div class="img-wrap" v-for="url in previewUrls" :key="url">
-        <span class="close" v-on:click="removeImageFromPreview(url.fileName)"
-          ><font-awesome-icon icon="times"
-        /></span>
-        <img
-          :src="url.url"
+      </div>
+      <div
+        class="
+          form-group
+          mt-1
+          p-1
+          mb-0
+          row
+          d-flex
+          justify-content-between
+          add-message-box
+        "
+      >
+        <button
+          v-if="!(message.length > 0)"
+          class="btn btn-send w-10"
+          v-on:click="handleSelectFile()"
+        >
+          <font-awesome-icon icon="images" />
+        </button>
+        <textarea
+          autocomplete="off"
           style="
-            width: 100px;
-            height: 100px;
-            object-fit: fill;
-            border-radius: 20px;
+            border-radius: 100px;
+            height: 36px;
+            overflow: hidden;
+            resize: none;
           "
-          class="p-2"
-          alt=""
-        />
+          type="text"
+          class="form-control w-90"
+          id="formGroupExampleInput2"
+          placeholder="Nhập tin nhắn"
+          v-model="message"
+          rows="5"
+          :class="{
+            'w-90': message.length > 0,
+            'w-80': message.length === 0 && actualFileLength > 0,
+          }"
+        ></textarea>
+
+        <button
+          v-if="message.length > 0 && actualFileLength === 0"
+          class="btn w-10 btn-send"
+          style="border: none"
+          v-on:click="sendMessage()"
+        >
+          <font-awesome-icon icon="paper-plane" />
+        </button>
+
+        <button
+          v-else-if="message.length === 0 && actualFileLength > 0"
+          class="btn w-10 btn-send"
+          style="border: none"
+          v-on:click="submitFile()"
+        >
+          <font-awesome-icon icon="paper-plane" />
+        </button>
+
+        <button
+          v-else-if="message.length > 0 && actualFileLength > 0"
+          class="btn w-10 btn-send"
+          style="border: none"
+          v-on:click="submitFile()"
+        >
+          <font-awesome-icon icon="paper-plane" />
+        </button>
+      </div>
+    </section>
+    <div class="container d-none">
+      <div class="large-12 medium-12 small-12 cell">
+        <label
+          >File
+          <input
+            type="file"
+            id="file"
+            ref="file"
+            multiple
+            v-on:change="handleFileUpload()"
+          />
+        </label>
+        <button v-on:click="submitFile()">Submit</button>
       </div>
     </div>
-    <div
-      class="
-        form-group
-        mt-1
-        p-1
-        mb-0
-        row
-        d-flex
-        justify-content-between
-        add-message-box
-      "
-    >
-      <button
-        v-if="!(message.length > 0)"
-        class="btn btn-send w-10"
-        v-on:click="handleSelectFile()"
-      >
-        <font-awesome-icon icon="images" />
-      </button>
-      <textarea
-        autocomplete="off"
-        style="
-          border-radius: 100px;
-          height: 36px;
-          overflow: hidden;
-          resize: none;
-        "
-        type="text"
-        class="form-control w-90"
-        id="formGroupExampleInput2"
-        placeholder="Nhập tin nhắn"
-        v-model="message"
-        rows="5"
-        :class="{
-          'w-90': message.length > 0,
-          'w-80': message.length === 0 && files.length > 0,
-        }"
-      ></textarea>
-
-      <button
-        v-if="message.length > 0 && files.length === 0"
-        class="btn w-10 btn-send"
-        style="border: none"
-        v-on:click="sendMessage()"
-      >
-        <font-awesome-icon icon="paper-plane" />
-      </button>
-
-      <button
-        v-else-if="message.length === 0 && files.length > 0"
-        class="btn w-10 btn-send"
-        style="border: none"
-        v-on:click="submitFile()"
-      >
-        <font-awesome-icon icon="paper-plane" />
-      </button>
-
-      <button
-        v-else-if="message.length > 0 && files.length > 0"
-        class="btn w-10 btn-send"
-        style="border: none"
-        v-on:click="submitFile()"
-      >
-        <font-awesome-icon icon="paper-plane" />
-      </button>
-
-    </div>
-  </section>
-  <div class="container d-none">
-    <div class="large-12 medium-12 small-12 cell">
-      <label
-        >File
-        <input
-          type="file"
-          id="file"
-          ref="file"
-          multiple
-          v-on:change="handleFileUpload()"
-        />
-      </label>
-      <button v-on:click="submitFile()">Submit</button>
-    </div>
   </div>
-  </div>
+  <ImageList :imageUrls="imageMessages.imageUrls"> </ImageList>
+
+  <modal
+    style="width: 100%; height: 100%"
+    v-if="showModal"
+    @closeModal="showModal = false"
+    :imageUrl="currentImage"
+  >
+  </modal>
 </template>
 
 <script>
-import conversation from '../../apis/conversation';
-import UserItem from '../users/UserItem.vue';
+import conversation from '../apis/conversation';
+import Message from '../components/users/Message.vue';
 import { HubConnectionBuilder, LogLevel } from '@aspnet/signalr';
-import signalr from '../../utils/signalr';
-import file from '../../apis/file';
+import signalr from '../utils/signalr';
+import file from '../apis/file';
+import { mapActions, mapGetters } from 'vuex';
+import modal from '../components/modals/modal.vue';
+import ImageList from '../components/users/ImageList.vue';
 export default {
-  inject: ['users', 'teams'],
   components: {
-    UserItem,
+    Message,
+    modal,
+    ImageList,
   },
   props: ['teamId'],
   data() {
@@ -149,10 +162,29 @@ export default {
       isTyping: false,
       files: [],
       fileUrls: [],
-      previewUrls: []
+      previewUrls: [],
+      showModal: false,
+      currentImage: '',
+      imageMessages: {
+        currentSkip: 0,
+        images: [],
+        imageUrls: [],
+      },
     };
   },
   computed: {
+    actualFileLength() {
+      let count = 0;
+      for (let i = 0; i < this.files.length; i++) {
+        const exist = this.previewUrls.find(
+          (x) => x.fileName === this.files[i].name
+        );
+        if (exist != null) {
+          count++;
+        }
+      }
+      return count;
+    },
     receiverName() {
       const currentUser = JSON.parse(localStorage.getItem('currentUser'));
       const conversation = JSON.parse(localStorage.getItem('conversations'));
@@ -164,9 +196,37 @@ export default {
       ).member_name;
       return name;
     },
+    ...mapGetters('conversation', ['get']),
   },
   methods: {
+    getImages(teamId) {
+      const currentUser = JSON.parse(localStorage.getItem('user'));
+      if (currentUser === null) return 'Có lỗi xảy ra';
+      conversation
+        .getImagesByConversationId(teamId, this.imageMessages.currentSkip, 3)
+        .then((response) => {
+          this.imageMessages.images.push(response.data.result);
+          this.imageMessages.currentSkip += 3;
+
+          for (let i = 0; i < response.data.result.length; i++) {
+            this.imageMessages.imageUrls = this.imageMessages.imageUrls.concat(
+              response.data.result[i].content
+            );
+          }
+        })
+        .catch((error) => console.log(error));
+    },
+    ...mapActions('conversation', ['set']),
+
+    setImageModal(data) {
+      this.currentImage = data;
+      this.showModal = true;
+    },
+    closeModal() {
+      this.showModal = false;
+    },
     removeImageFromPreview(fileName) {
+      debugger;
       const file = this.previewUrls.find((x) => x.fileName === fileName);
       const index = this.previewUrls.indexOf(file);
       this.previewUrls.splice(index, 1);
@@ -192,7 +252,12 @@ export default {
     submitFile() {
       let formData = new FormData();
       for (let i = 0; i < this.files.length; i++) {
-        formData.append('Files', this.files[i], this.files[i].name);
+        let isExist = this.previewUrls.find(
+          (x) => x.fileName === this.files[i].name
+        );
+        if (isExist) {
+          formData.append('Files', this.files[i], this.files[i].name);
+        }
       }
 
       formData.append('Folder', 'messages');
@@ -273,7 +338,7 @@ export default {
       this.isTyping = isTyping;
     },
 
-    loadTeamMembers(teamId) {
+    loadConversationItem(teamId) {
       const currentUser = JSON.parse(localStorage.getItem('user'));
       if (currentUser === null) return 'Có lỗi xảy ra';
       conversation
@@ -299,9 +364,7 @@ export default {
         conversation
           .sendMessage(messageToSend)
           .then((response) => {
-            console.log(response);
             this.messages.push(response.data.result);
-
             this.message = '';
             const connection = new HubConnectionBuilder()
               .withUrl('https://localhost:44356/messagehub')
@@ -334,15 +397,15 @@ export default {
       const items = document.querySelectorAll('.single-message');
       const last = items[items.length - 1];
       last.scrollIntoView();
-    }
+    },
   },
   created() {
     this.currentSkip = 0;
-    this.messages=[];
-    this.loadTeamMembers(this.teamId);
+    this.loadConversationItem(this.teamId);
   },
   mounted() {
     signalr.listen('ReceiveMessage', this.receiveMessage);
+    this.set(this.teamId);
   },
   watch: {
     messages() {
@@ -352,10 +415,12 @@ export default {
         if (this.currentSkip === 15) {
           last.scrollIntoView({ behavior: 'smooth' });
         }
+        this.getImages(this.teamId);
       });
     },
   },
   updated() {
+    debugger;
     const items = document.querySelectorAll('.single-message');
     const last = items[items.length - 1];
     last.scrollIntoView({ behavior: 'smooth' });
@@ -399,7 +464,7 @@ section {
   margin: 2rem auto;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.26);
   padding: 1rem;
-  border-radius: 12px;
+  border-radius: 5px;
 }
 
 h2 {
@@ -436,7 +501,7 @@ ul {
 }
 
 .btn-send {
-  background-color: GRAY;
+  background-color: #2a8383;
   color: white;
 }
 
@@ -457,79 +522,73 @@ ul {
   color: white;
 }
 
-#imageDetail{
+#imageDetail {
   width: 100%;
-  height: 100%;  
-  background-color: black ;
+  height: 100%;
+  background-color: black;
 }
 
-.modal {
-  display: none; /* Hidden by default */
-  position: fixed; /* Stay in place */
-  z-index: 1; /* Sit on top */
-  padding-top: 100px; /* Location of the box */
-  left: 0;
+.modal-mask {
+  position: fixed;
+  z-index: 9998;
   top: 0;
-  width: 100%; /* Full width */
-  height: 100%; /* Full height */
-  overflow: auto; /* Enable scroll if needed */
-  background-color: rgb(0,0,0); /* Fallback color */
-  background-color: rgba(0,0,0,0.9); /* Black w/ opacity */
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: table;
+  transition: opacity 0.3s ease;
 }
 
-/* Modal Content (Image) */
-.modal-content {
-  margin: auto;
-  display: block;
-  width: 80%;
-  max-width: 700px;
+.modal-wrapper {
+  display: table-cell;
+  vertical-align: middle;
 }
 
-/* Caption of Modal Image (Image Text) - Same Width as the Image */
-#caption {
-  margin: auto;
-  display: block;
-  width: 80%;
-  max-width: 700px;
-  text-align: center;
-  color: #ccc;
-  padding: 10px 0;
-  height: 150px;
+.modal-container {
+  width: 300px;
+  margin: 0px auto;
+  padding: 20px 30px;
+  background-color: #fff;
+  border-radius: 2px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.33);
+  transition: all 0.3s ease;
+  font-family: Helvetica, Arial, sans-serif;
 }
 
-/* Add Animation - Zoom in the Modal */
-.modal-content, #caption {
-  animation-name: zoom;
-  animation-duration: 0.6s;
+.modal-header h3 {
+  margin-top: 0;
+  color: #42b983;
 }
 
-@keyframes zoom {
-  from {transform:scale(0)}
-  to {transform:scale(1)}
+.modal-body {
+  margin: 20px 0;
 }
 
-/* The Close Button */
-.close {
-  position: absolute;
-  top: 15px;
-  right: 35px;
-  color: #f1f1f1;
-  font-size: 40px;
-  font-weight: bold;
-  transition: 0.3s;
+.modal-default-button {
+  float: right;
 }
 
-.close:hover,
-.close:focus {
-  color: #bbb;
-  text-decoration: none;
-  cursor: pointer;
+/*
+ * The following styles are auto-applied to elements with
+ * transition="modal" when their visibility is toggled
+ * by Vue.js.
+ *
+ * You can easily play with the modal transition by editing
+ * these styles.
+ */
+
+.modal-enter {
+  opacity: 0;
 }
 
-/* 100% Image Width on Smaller Screens */
-@media only screen and (max-width: 700px){
-  .modal-content {
-    width: 100%;
-  }
+.modal-leave-active {
+  opacity: 0;
+}
+
+.modal-enter .modal-container,
+.modal-leave-active .modal-container {
+  -webkit-transform: scale(1.1);
+  transform: scale(1.1);
 }
 </style> */

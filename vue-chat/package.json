@@ -19,7 +19,8 @@
     "vue": "^3.0.0",
     "vue-chat-scroll": "^1.4.0",
     "vue-router": "^4.0.0-0",
-    "vue-scroll-loader": "^2.2.0"
+    "vue-scroll-loader": "^2.2.0",
+    "vuex": "^4.0.2"
   },
   "devDependencies": {
     "@aspnet/signalr": "^1.0.27",

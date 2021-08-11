@@ -2,9 +2,9 @@ import { createApp } from 'vue';
 import { createRouter, createWebHistory } from 'vue-router';
 
 import App from './App.vue';
-import TeamsList from './components/teams/TeamsList.vue';
-import UsersList from './components/users/UsersList.vue';
-import TeamMembers from './components/teams/TeamMembers.vue';
+import Conversations from './pages/Conversations.vue';
+import Login from './components/users/Login.vue';
+import ConversationItem from './pages/ConversationItem.vue';
 import NotFound from './components/nav/NotFound.vue';
 import TeamsFooter from './components/teams/TeamsFooter.vue';
 import UsersFooter from './components/users/UsersFooter.vue';
@@ -16,33 +16,36 @@ import {
   faUserSecret
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+
+import store from './store/index';
+
 const router = createRouter({
   history: createWebHistory(),
   routes: [
     {
       path: '/',
-      redirect: '/teams'
+      redirect: '/conversations'
     },
     {
-      mame: 'teams',
-      path: '/teams',
+      mame: 'conversations',
+      path: '/conversations',
       components: {
-        default: TeamsList,
+        default: Conversations,
         footer: TeamsFooter
       }, 
       children:[
         {
           name: 'team-members',
           path: ':teamId',
-          component: TeamMembers,
+          component: ConversationItem,
           props: true
         }    
       ]
     },
     {
-      path: '/users',
+      path: '/login',
       components: {
-        default: UsersList,
+        default: Login,
         footer: UsersFooter
       }
     },
@@ -61,13 +64,14 @@ const router = createRouter({
   },
   beforeEach(to, from, next) {
     debugger;
-    const publicPages = ['/users'];
+    const publicPages = ['/login'];
     const authRequired = !publicPages.includes(to.path);
-    const loggedIn = localStorage.getItem('user');
-    const _loggedIn = localStorage.getItem('currentUser');
+    debugger;
+    const loggedIn =JSON.parse(localStorage.getItem('user'));
+    const _loggedIn =JSON.parse(localStorage.getItem('currentUser'));
 
     if (authRequired && (!loggedIn || !_loggedIn)) {
-      return next('/users');
+      return next('/login');
     }
 
     next();
@@ -79,8 +83,9 @@ library.add(faImages);
 library.add(faPaperPlane);
 library.add(faTimes);
 const app = createApp(App);
-
+app.use(store);
 app.component('font-awesome-icon', FontAwesomeIcon);
 
 app.use(router);
+
 app.mount('#app');
